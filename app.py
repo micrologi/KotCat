@@ -227,11 +227,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🐱 KotCat - Ajudando com sua cotação")
+st.title("🐱 KotCat - Ajudo com sua cotação!")
 
 # Formulário
 with st.container():
-    st.markdown("### Vamos ajudar com sua cotação. Preencha o formulário abaixo:")
+    st.markdown("### Miau..vou te ajudar com sua cotação! Preencha o formulário abaixo:")
 
     form_container = st.container()
     with form_container:
@@ -248,7 +248,7 @@ with st.container():
             SENSIBILIDADE = st.slider("Sensibilidade", min_value=1, max_value=20, value=13, step=1)
 
         st.markdown("#### Mensagem")
-        mensagem = st.text_area("Escreva sua mensagem (até 1500 caracteres)", max_chars=1500, label_visibility="collapsed")
+        mensagem = st.text_area("Escreva a mensagem da cotação a ser enviada (até 1500 caracteres)", max_chars=1500, label_visibility="collapsed")
 
         enviar = st.button("Buscar as melhores empresas", use_container_width=True)
 
