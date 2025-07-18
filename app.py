@@ -224,6 +224,21 @@ st.markdown("""
     .stTextArea textarea {
         height: 150px !important;
     }
+    /* Customização do st.warning para fundo vermelho */
+    .stAlert {
+        background-color: #ff4444 !important;
+        color: white !important;
+        text-color: white !important;
+        border: 1px solid #cc0000 !important;
+    }
+    .stAlert .stAlertContent {
+        color: white !important;
+        text-color: white !important;
+    }
+    .st-emotion-cache-1104ytp p, .st-emotion-cache-1104ytp ol, .st-emotion-cache-1104ytp ul, .st-emotion-cache-1104ytp dl, .st-emotion-cache-1104ytp li {
+        color: white !important;
+        text-color: white !important;
+    }    
     </style>
 """, unsafe_allow_html=True)
 
@@ -250,7 +265,7 @@ with st.container():
         st.markdown("#### Mensagem")
         mensagem = st.text_area("Escreva a mensagem da cotação a ser enviada (até 1500 caracteres)", max_chars=1500, label_visibility="collapsed")
 
-        enviar = st.button("Buscar as melhores empresas", use_container_width=True)
+        enviar = st.button("Clique aqui para eu analisar e trazer as empresas", use_container_width=True)
 
         if enviar:
             
@@ -402,7 +417,7 @@ with st.container():
                 # Limpar o container de progresso quando terminar
                 progress_container.empty()
             else:
-                st.warning("Nenhuma empresa encontrada com os critérios especificados.")
+                st.warning("Muaa Muaaa, não encontrei nenhuma empresa com os critérios especificados.")
             #st.markdown(f"**Estado:** {estado}  \n**Cidade:** {cidade}  \n**Tipo:** {tipo_negocio}  \n**Mensagem:** {mensagem}")
 
 
