@@ -1,0 +1,86 @@
+
+"""
+def pesquisar_negocios(api_key: str, negocio: str = "serralheria", latitude: float = -21.1775, longitude: float = -47.8103, max_pages: int = 20, nota_minima: float = 0, mensagem: str = "") -> pl.DataFrame:
+    todos_resultados = []
+    
+    mensagem_codificada = urllib.parse.quote(mensagem)
+
+    for pagina in range(max_pages):
+        print(f"🔎 Processando página: {pagina + 1}")
+
+        params = {
+            "engine": "google_maps",
+            "q": negocio,
+            "ll": f"@{latitude},{longitude},13z",
+            "type": "search",
+            "start": pagina * 20,
+            "api_key": api_key,
+        }
+
+        search = GoogleSearch(params)
+        results = search.get_dict()
+        locais = results.get("local_results", [])
+        
+        print(results)
+
+        if not locais:
+            print("✅ Fim dos resultados.")
+            break
+
+        for lugar in locais:
+            
+            phone = str(lugar.get("phone"))
+            if (phone == "None" or phone.strip() == ""):
+                continue
+            
+            if (nota_minima != 0) and (lugar.get("rating") < nota_minima):
+                continue            
+            
+            website = str(lugar.get("website"))
+            if (website == "None" or website.strip() == ""):
+                website = ""
+            else:
+                website = f"<a href='{website}' target='_blank'>{website}</a>"
+            
+            #"telefone": "<a href='https://wa.me/5511999999999?text=" + mensagem_codificada + "'</a>",
+            
+            dados = {
+                "Nome": lugar.get("title"),
+                "Endereço": lugar.get("address"),
+                "Nota": lugar.get("rating"),
+                "Avaliações": lugar.get("reviews"),
+                "WhatsApp/Fone": phone,
+                "Site": website
+            }
+            todos_resultados.append(dados)
+
+        time.sleep(2)  # evitar bloqueio por uso excessivo
+
+    # Retornar os dados como um DataFrame Polars
+    df_ret = pl.DataFrame(todos_resultados)
+    
+    # Considera quem não recebeu avaliações, um mediano
+    df_ret = df_ret.with_columns(
+        pl.when(pl.col("Nota").is_null())
+        .then(3)
+        .otherwise(pl.col("Nota"))
+        .alias("Nota")
+    )            
+    
+    # Considera quantidade de avaliações 0 quando for null
+    df_ret = df_ret.with_columns(
+        pl.when(pl.col("Avaliações").is_null())
+        .then(0)
+        .otherwise(pl.col("Avaliações"))
+        .alias("Avaliações")
+    )                
+            
+    df_ret = df_ret.sort(pl.col("Nota") + pl.col("Avaliações"),descending=True)
+    
+    df_ret = df_ret.with_columns(
+        pl.arange(1, 1 + df_ret.height).alias("Id")
+    )
+    df_ret = df_ret.select(["Id"] + [col for col in df_ret.columns if col != "Id"])
+    
+    return df_ret
+"""    

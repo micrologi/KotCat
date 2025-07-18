@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Orçamentos</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #eee; }
+  </style>
+</head>
+<body>
+
+    <h1>🔍 Busca de Negócios Locais</h1>
+
+    <label for="form_negocio">Tipo de negócio (ex: serralheria, pizzaria, farmácia):</label>
+    <input type="text" id="form_negocio" placeholder="Digite o tipo de negócio">
+
+    <label for="form_mensagem">Solicitação:</label>
+    <textarea id="form_mensagem" rows="3" placeholder="Escreva algo..."></textarea>
+
+    <button onclick="buscarNegocios()">Buscar</button>
+
+    <h2>Resultados</h2>
+    <table id="tabela">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nome</th>
+            <th>Endereço</th>
+            <th>Nota</th>
+            <th>Avaliações</th>
+            <th>Telefone</th>
+            <th>Site</th>
+            <th>Maps</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+    function buscarNegocios() {
+        const form_negocio = document.getElementById('form_negocio').value.trim();
+        const form_mensagem = document.getElementById('form_mensagem').value.trim();
+
+        if (!form_negocio) {
+            alert("Por favor, preencha o tipo de negócio!");
+            return;
+        }
+
+        const url = `http://localhost:8000/orcamento?form_negocio=${encodeURIComponent(form_negocio)}&form_mensagem=${encodeURIComponent(form_mensagem)}`;
+
+        fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            const corpo = document.querySelector("#tabela tbody");
+            corpo.innerHTML = "";
+
+            if (!data.length) {
+            corpo.innerHTML = "<tr><td colspan='8'>Nenhum resultado encontrado.</td></tr>";
+            return;
+            }
+
+            data.forEach(lugar => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${lugar.id || ""}</td>
+                <td>${lugar.nome || ""}</td>
+                <td>${lugar.endereco || ""}</td>
+                <td>${lugar.nota || ""}</td>
+                <td>${lugar.avaliacoes || ""}</td>
+                <td>${lugar.telefone || ""}</td>
+                <td><a href="${lugar.site}" target="_blank">${lugar.site ? "Site" : ""}</a></td>
+                <td><a href="${lugar.link_maps}" target="_blank">Maps</a></td>
+            `;
+            corpo.appendChild(row);
+            });
+        })
+        .catch(err => {
+            alert("Erro ao buscar os dados.");
+            console.error(err);
+        });
+    }
+    </script>  
+
+</body>
+</html>
