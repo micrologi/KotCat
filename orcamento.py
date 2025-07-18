@@ -3,8 +3,17 @@ import time
 import urllib.parse
 import requests
 import json
+import math
 
-def pesquisar_negocios(api_key: str, negocio: str = "serralheria", latitude: float = -21.1775, longitude: float = -47.8103, nota_minima: float = 0, mensagem: str = "") -> pl.DataFrame:
+def indice_avaliacao(nota: float=3, avaliacoes: int=0)->float:
+    # Calcula o índice original
+    ret = nota * math.log10(avaliacoes + 1)    
+    ret = min(100, (ret / 12) * 100)
+    
+    return round(ret, 2)
+    
+
+def pesquisar_negocios(api_key: str, negocio: str = "serralheria", latitude: float = -21.1775, longitude: float = -47.8103, avaliacao_minima: float = 0, mensagem: str = "", raio: int = 13) -> pl.DataFrame:
     url = "https://google.serper.dev/maps"
     
     headers = {
@@ -15,7 +24,7 @@ def pesquisar_negocios(api_key: str, negocio: str = "serralheria", latitude: flo
     payload = json.dumps({
         "q": negocio,
         "hl": "pt-br",
-        "ll": f"@{latitude},{longitude},13z"
+        "ll": f"@{latitude},{longitude},{raio}z"
     })
 
     results = requests.request("POST", url, headers=headers, data=payload)    
@@ -31,20 +40,18 @@ def pesquisar_negocios(api_key: str, negocio: str = "serralheria", latitude: flo
         if (phone == "None" or phone.strip() == ""):
             continue
 
-        if (nota_minima != 0) and (lugar.get("rating") < nota_minima):
-            continue            
-        
         website = str(lugar.get("website"))
         if (website == "None" or website.strip() == ""):
             website = ""
-        
-        #"telefone": "<a href='https://wa.me/5511999999999?text=" + mensagem_codificada + "'</a>",
-        
+            
+        avaliacao = indice_avaliacao(lugar.get("rating"), lugar.get("ratingCount"))
+        if (avaliacao < avaliacao_minima):
+            continue
+                
         dados = {
             "Nome": lugar.get("title"),
             "Endereço": lugar.get("address"),
-            "Nota": lugar.get("rating"),
-            "Avaliações": lugar.get("ratingCount"),
+            "avaliacao": avaliacao,
             "WhatsApp/Fone": phone,
             "Site": website
         }
@@ -53,23 +60,8 @@ def pesquisar_negocios(api_key: str, negocio: str = "serralheria", latitude: flo
     # Retornar os dados como um DataFrame Polars
     df_ret = pl.DataFrame(todos_resultados)
     
-    # Considera quem não recebeu avaliações, um mediano
-    df_ret = df_ret.with_columns(
-        pl.when(pl.col("Nota").is_null())
-        .then(3)
-        .otherwise(pl.col("Nota"))
-        .alias("Nota")
-    )            
-    
-    # Considera quantidade de avaliações 0 quando for null
-    df_ret = df_ret.with_columns(
-        pl.when(pl.col("Avaliações").is_null())
-        .then(0)
-        .otherwise(pl.col("Avaliações"))
-        .alias("Avaliações")
-    )                
             
-    df_ret = df_ret.sort(pl.col("Nota") + pl.col("Avaliações"),descending=True)
+    df_ret = df_ret.sort(pl.col("avaliacao"),descending=True)
     
     df_ret = df_ret.with_columns(
         pl.arange(1, 1 + df_ret.height).alias("Id")
