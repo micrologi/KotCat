@@ -275,10 +275,24 @@ with st.container():
             # Buscar a latitude e longitude do endereço
             endereco = f"{cidade}, {estado}, Brazil"
             
-            geolocator = Nominatim(user_agent="kotcat")
-            location = geolocator.geocode(endereco)
-            LATITUDE = location.latitude
-            LONGITUDE = location.longitude                        
+            try:
+                geolocator = Nominatim(user_agent="kotcat", timeout=10)
+                location = geolocator.geocode(endereco)
+                
+                if location is None:
+                    st.error(f"🐱 Não consegui encontrar as coordenadas para {endereco}. Tentando coordenadas padrão...")
+                    # Coordenadas padrão (São Paulo)
+                    LATITUDE = -23.5505
+                    LONGITUDE = -46.6333
+                else:
+                    LATITUDE = location.latitude
+                    LONGITUDE = location.longitude
+                    
+            except Exception as e:
+                st.warning(f"🐱 Erro ao buscar coordenadas: {str(e)}. Usando coordenadas padrão...")
+                # Coordenadas padrão (São Paulo)
+                LATITUDE = -23.5505
+                LONGITUDE = -46.6333                        
 
             #st.success("✅ Perfeito, agora vamos buscar as empresas para você. Aguarde, elas serão exibidas logo abaixo:")
             
