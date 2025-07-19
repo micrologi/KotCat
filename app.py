@@ -361,12 +361,12 @@ with st.container():
                 
                 # Criar container para progresso
                 progress_container = st.empty()
-                progress_container.info(f"🔄 Processando {len(df_pandas)} empresas...")
+                progress_container.info(f"🐱🔄 Processando {len(df_pandas)} empresas...")
                 
                 # Exibir cards para cada empresa com atualização progressiva
                 for index, row in df_pandas.iterrows():
                     # Atualizar progresso
-                    progress_container.info(f"🔄 Processando empresa {index + 1} de {len(df_pandas)}...")
+                    progress_container.info(f"🐱🔄 Processando empresa {index + 1} de {len(df_pandas)}...")
                     
                     # Criar container para cada card
                     card_container = st.empty()
@@ -418,7 +418,7 @@ with st.container():
                 # Limpar o container de progresso quando terminar
                 progress_container.empty()
             else:
-                st.warning("Muaa Muaaa, não encontrei nenhuma empresa com os critérios especificados.")
+                st.warning("🐱 Muaa Muaaa, não encontrei nenhuma empresa com os critérios especificados.")
             #st.markdown(f"**Estado:** {estado}  \n**Cidade:** {cidade}  \n**Tipo:** {tipo_negocio}  \n**Mensagem:** {mensagem}")
 
 
