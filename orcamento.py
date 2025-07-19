@@ -45,9 +45,6 @@ def pesquisar_negocios(api_key: str, negocio: str = "serralheria", latitude: flo
         if (website == "None" or website.strip() == ""):
             website = ""
 
-        print(lugar.get("rating"))
-        print(lugar.get("ratingCount"))
-
         rating = str(lugar.get("rating"))
         if (rating == "None" or rating.strip() == ""):
             rating = 0

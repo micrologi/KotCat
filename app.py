@@ -7,6 +7,7 @@ import json
 import urllib.parse
 from geopy.geocoders import Nominatim
 
+
 # Configurações da página
 st.set_page_config(
     page_title="KotCat - Ajudando com sua cotação",
