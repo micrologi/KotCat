@@ -6,6 +6,7 @@ import json
 import math
 
 def indice_avaliacao(nota: float=3, avaliacoes: int=0)->float:
+    
     # Calcula o índice original
     ret = nota * math.log10(avaliacoes + 1)    
     ret = min(100, (ret / 12) * 100)
@@ -43,8 +44,23 @@ def pesquisar_negocios(api_key: str, negocio: str = "serralheria", latitude: flo
         website = str(lugar.get("website"))
         if (website == "None" or website.strip() == ""):
             website = ""
+
+        print(lugar.get("rating"))
+        print(lugar.get("ratingCount"))
+
+        rating = str(lugar.get("rating"))
+        if (rating == "None" or rating.strip() == ""):
+            rating = 0
+        else:
+            rating = float(rating)
             
-        avaliacao = indice_avaliacao(lugar.get("rating"), lugar.get("ratingCount"))
+        ratingCount = str(lugar.get("ratingCount"))
+        if (ratingCount == "None" or ratingCount.strip() == ""):
+            ratingCount = 0
+        else:
+            ratingCount = int(ratingCount)
+            
+        avaliacao = indice_avaliacao(rating, ratingCount)
         if (avaliacao < avaliacao_minima):
             continue
                 
