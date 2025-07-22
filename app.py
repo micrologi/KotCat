@@ -1,11 +1,12 @@
 from typing import get_overloads
 import streamlit as st
 import pandas as pd
-from orcamento import pesquisar_negocios
+from orcamento import Orcamento
 import requests
 import json
 import urllib.parse
 from geopy.geocoders import Nominatim
+from banco import Banco
 
 
 # Configurações da página
@@ -15,206 +16,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
-
-# Dados simulados
-url_estados = "https://servicodados.ibge.gov.br/api/v1/localidades/estados"
-estados = requests.get(url_estados).json()
-
-estados_cidades = {}
-
-for uf in estados:
-    sigla = uf["sigla"]
-    nome = uf["nome"]
-    url_mun = f"https://servicodados.ibge.gov.br/api/v1/localidades/estados/{sigla}/municipios"
-    munis = requests.get(url_mun).json()
-    cidades = [m["nome"] for m in munis]
-    estados_cidades[nome] = sorted(cidades)    
-
-tipos_negocios = sorted([
-    "Academia",
-    "Acupuntura",
-    "Adestrador de Animais",
-    "Advocacia",
-    "Agência de Marketing",
-    "Agência de Publicidade",
-    "Agência de Turismo",
-    "Alfaiataria",
-    "Aluguel de Brinquedos",
-    "Aluguel de Carros",
-    "Aluguel de Equipamentos",
-    "Aluguel de Ferramentas",
-    "Análise Ambiental",
-    "Animação de Festas",
-    "Arquitetura",
-    "Artesanato Personalizado",
-    "Assessoria de Imprensa",
-    "Assessoria de Investimentos",
-    "Assessoria Jurídica",
-    "Assistência Técnica de Celulares",
-    "Assistência Técnica de Eletrodomésticos",
-    "Assistência Técnica de Informática",
-    "Ateliê de Costura",
-    "Auto Elétrica",
-    "Auto Escola",
-    "Babá",
-    "Barbearia",
-    "Bartender para Eventos",
-    "Buffet Infantil",
-    "Buffet para Eventos",
-    "Cabeleireiro",
-    "Caminhão de Mudanças",
-    "Capacitação Profissional",
-    "Carpintaria",
-    "Cerimonialista",
-    "Chaveiro",
-    "Clínica de Estética",
-    "Clínica de Fisioterapia",
-    "Clínica de Nutrição",
-    "Clínica de Psicologia",
-    "Clínica Odontológica",
-    "Cobrança e Recuperação de Crédito",
-    "Colocador de Papel de Parede",
-    "Comida por Encomenda",
-    "Compras e Entregas",
-    "Consultoria Ambiental",
-    "Consultoria de Beleza",
-    "Consultoria de Engenharia",
-    "Consultoria de Moda",
-    "Consultoria de Negócios",
-    "Consultoria Educacional",
-    "Consultoria Empresarial",
-    "Consultoria Financeira",
-    "Consultoria Imobiliária",
-    "Consultoria Jurídica",
-    "Consultoria Organizacional",
-    "Consultoria Técnica",
-    "Contabilidade",
-    "Corretores de Imóveis",
-    "Criação de Sites",
-    "Cuidador de Animais",
-    "Cuidador de Idosos",
-    "Cursos de Informática",
-    "Cursos de Línguas",
-    "Cursos Online",
-    "Decoração de Festas",
-    "Dedetização",
-    "Delivery de Bebidas",
-    "Delivery de Comida",
-    "Desenvolvimento de Software",
-    "Desenvolvimento Web",
-    "Designer de Interiores",
-    "Designer Gráfico",
-    "Detetive Particular",
-    "Diagramação de Livros",
-    "Digitação de Documentos",
-    "DJ para Eventos",
-    "Eletricista",
-    "Embelezamento de Unhas",
-    "Empreiteira",
-    "Encanador",
-    "Engenharia Civil",
-    "Engenharia Elétrica",
-    "Engenharia Mecânica",
-    "Ensino Particular",
-    "Entregas Rápidas",
-    "Entregador Autônomo",
-    "Escola de Música",
-    "Escola Infantil",
-    "Estética Automotiva",
-    "Estúdio de Fotografia",
-    "Eventos Corporativos",
-    "Fabricação de Móveis Planejados",
-    "Facilitador de Dinâmicas",
-    "Faxineira",
-    "Ferramentaria",
-    "Fisioterapia Domiciliar",
-    "Fretamento de Vans",
-    "Funilaria",
-    "Garçom para Eventos",
-    "Gesso e Drywall",
-    "Gestão de Mídias Sociais",
-    "Gestão de RH",
-    "Gravação de Áudio",
-    "Guincho",
-    "Guias de Turismo",
-    "Higienização de Estofados",
-    "Hospedagem de Sites",
-    "Impressão 3D",
-    "Impressão de Documentos",
-    "Instalador de Ar-condicionado",
-    "Instalação de Câmeras",
-    "Instalação de Energia Solar",
-    "Instalação de Internet",
-    "Instalação de Painéis",
-    "Instalação de Portas",
-    "Instalação de Toldos",
-    "Jardinagem",
-    "Lavanderia",
-    "Limpeza de Caixa d’Água",
-    "Limpeza de Piscinas",
-    "Limpeza Pós-obra",
-    "Manutenção de Elevadores",
-    "Manutenção de Máquinas",
-    "Manutenção de Piscinas",
-    "Manutenção Predial",
-    "Manicure e Pedicure",
-    "Marketing Digital",
-    "Marido de Aluguel",
-    "Marmoraria",
-    "Mecânica de Automóveis",
-    "Mecânica de Motos",
-    "Mensageiro",
-    "Montador de Móveis",
-    "Motoboy",
-    "Mototáxi",
-    "Mudanças",
-    "Nutricionista",
-    "Organizador de Eventos",
-    "Paisagismo",
-    "Panfletagem",
-    "Pedreiro",
-    "Personal Organizer",
-    "Personal Trainer",
-    "Pet Sitter",
-    "Pintor",
-    "Podólogo",
-    "Portaria e Segurança",
-    "Professor Particular",
-    "Programador",
-    "Promotor de Eventos",
-    "Psicopedagogo",
-    "Reformas em Geral",
-    "Reforço Escolar",
-    "Reparos em Telhado",
-    "Revisão de Texto",
-    "Salão de Beleza",
-    "Serviços de Alvenaria",
-    "Serviços de Pintura",
-    "Serviços Domésticos",
-    "Serviços Gráficos",
-    "Serralheria",
-    "Serviços de Solda",
-    "Social Media",
-    "Som e Iluminação para Eventos",
-    "Suporte Técnico",
-    "Tapeçaria",
-    "Tatuador",
-    "Técnico de Informática",
-    "Telefonia Empresarial",
-    "Terapeuta Ocupacional",
-    "TI Corporativo",
-    "Tradutor",
-    "Transcrição de Áudio",
-    "Transporte Escolar",
-    "Transporte Executivo",
-    "Transporte de Cargas",
-    "Transporte de Passageiros",
-    "Treinamento Corporativo",
-    "Vidraceiro",
-    "Web Designer",
-    "Youtuber",
-    "Zeladoria",
-])
 
 # Estilo customizado
 st.markdown("""
@@ -249,13 +50,18 @@ st.title("🐱 KotCat - Ajudo com sua cotação!")
 with st.container():
     st.markdown("### Miau..vou te ajudar com sua cotação! Preencha o formulário abaixo:")
 
+    banco = Banco()
+    tipos_negocios = banco.obter_tipos()
+    estados_cidades = banco.obter_estados_cidades()
+    
+
     form_container = st.container()
     with form_container:
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
             tipo_negocio = st.selectbox("Tipo de Negócio", tipos_negocios)
         with col2:
-            estado = st.selectbox("Estado", list(estados_cidades.keys()), index=19)
+            estado = st.selectbox("Estado", list(estados_cidades.keys()), index=25)
         with col3:
             cidade = st.selectbox("Cidade", estados_cidades[estado], index=0)
         with col4:
@@ -273,31 +79,14 @@ with st.container():
             API_KEY = "ad5dca4b2eb7acb74b44360835ea1d21c031fd19"  
             
             # Buscar a latitude e longitude do endereço
-            endereco = f"{cidade}, {estado}, Brazil"
-            
-            try:
-                geolocator = Nominatim(user_agent="kotcat", timeout=10)
-                location = geolocator.geocode(endereco)
+            LATITUDE, LONGITUDE = banco.obter_latitude_longitude(cidade, estado)
                 
-                if location is None:
-                    st.error(f"🐱 Não consegui encontrar as coordenadas para {endereco}. Tentando coordenadas padrão...")
-                    # Coordenadas padrão (São Paulo)
-                    LATITUDE = -23.5505
-                    LONGITUDE = -46.6333
-                else:
-                    LATITUDE = location.latitude
-                    LONGITUDE = location.longitude
-                    
-            except Exception as e:
-                st.warning(f"🐱 Erro ao buscar coordenadas: {str(e)}. Usando coordenadas padrão...")
-                # Coordenadas padrão (São Paulo)
-                LATITUDE = -23.5505
-                LONGITUDE = -46.6333                        
-
             #st.success("✅ Perfeito, agora vamos buscar as empresas para você. Aguarde, elas serão exibidas logo abaixo:")
             
-            df_empresas = pesquisar_negocios(api_key=API_KEY, negocio=tipo_negocio, latitude=LATITUDE, longitude=LONGITUDE, avaliacao_minima=AVALIACAO_MINIMA, mensagem=mensagem, raio=SENSIBILIDADE)
-            
+            orcamento = Orcamento(API_KEY)
+            orcamento.pesquisar_negocios(negocio=tipo_negocio, latitude=LATITUDE, longitude=LONGITUDE, avaliacao_minima=AVALIACAO_MINIMA, raio=SENSIBILIDADE)
+            df_empresas = orcamento.obter_resultados()
+                        
             if df_empresas is not None and len(df_empresas) > 0:
                 # Converter para pandas para facilitar o acesso aos dados
                 df_pandas = df_empresas.to_pandas()
