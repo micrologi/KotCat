@@ -1,0 +1,21 @@
+.stApp {
+    background-color: #FFC83D;
+}
+.stTextArea textarea {
+    height: 150px !important;
+}
+/* Customização do st.warning para fundo vermelho */
+.stAlert {
+    background-color: #ff4444 !important;
+    color: white !important;
+    text-color: white !important;
+    border: 1px solid #cc0000 !important;
+}
+.stAlert .stAlertContent {
+    color: white !important;
+    text-color: white !important;
+}
+.st-emotion-cache-1104ytp p, .st-emotion-cache-1104ytp ol, .st-emotion-cache-1104ytp ul, .st-emotion-cache-1104ytp dl, .st-emotion-cache-1104ytp li {
+    color: white !important;
+    text-color: white !important;
+}

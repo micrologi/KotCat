@@ -7,7 +7,11 @@ import json
 import urllib.parse
 from geopy.geocoders import Nominatim
 from banco import Banco
+import dotenv
+import os
 
+# Carregar variáveis de ambiente do arquivo .env
+dotenv.load_dotenv()    
 
 # Configurações da página
 st.set_page_config(
@@ -18,31 +22,9 @@ st.set_page_config(
 )
 
 # Estilo customizado
-st.markdown("""
-    <style>
-    .stApp {
-        background-color: #FFC83D;
-    }
-    .stTextArea textarea {
-        height: 150px !important;
-    }
-    /* Customização do st.warning para fundo vermelho */
-    .stAlert {
-        background-color: #ff4444 !important;
-        color: white !important;
-        text-color: white !important;
-        border: 1px solid #cc0000 !important;
-    }
-    .stAlert .stAlertContent {
-        color: white !important;
-        text-color: white !important;
-    }
-    .st-emotion-cache-1104ytp p, .st-emotion-cache-1104ytp ol, .st-emotion-cache-1104ytp ul, .st-emotion-cache-1104ytp dl, .st-emotion-cache-1104ytp li {
-        color: white !important;
-        text-color: white !important;
-    }    
-    </style>
-""", unsafe_allow_html=True)
+# Carregar CSS externo
+with open(os.getenv('PATH_CSS_APP')) as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 st.title("🐱 KotCat - Ajudo com sua cotação!")
 
@@ -76,14 +58,12 @@ with st.container():
 
         if enviar:
             
-            API_KEY = "ad5dca4b2eb7acb74b44360835ea1d21c031fd19"  
-            
             # Buscar a latitude e longitude do endereço
             LATITUDE, LONGITUDE = banco.obter_latitude_longitude(cidade, estado)
                 
             #st.success("✅ Perfeito, agora vamos buscar as empresas para você. Aguarde, elas serão exibidas logo abaixo:")
             
-            orcamento = Orcamento(API_KEY)
+            orcamento = Orcamento(os.getenv('SERPER_API_KEY'))
             orcamento.pesquisar_negocios(negocio=tipo_negocio, latitude=LATITUDE, longitude=LONGITUDE, avaliacao_minima=AVALIACAO_MINIMA, raio=SENSIBILIDADE)
             df_empresas = orcamento.obter_resultados()
                         
@@ -92,73 +72,8 @@ with st.container():
                 df_pandas = df_empresas.to_pandas()
                 
                 # CSS para os cards
-                st.markdown("""
-                    <style>
-                    .empresa-card {
-                        background: white;
-                        border-radius: 10px;
-                        padding: 20px;
-                        margin: 10px 0;
-                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                        border-left: 4px solid #D48C00;
-                    }
-                    .empresa-nome {
-                        font-size: 18px;
-                        font-weight: bold;
-                        color: #333;
-                        margin-bottom: 10px;
-                    }
-                    .empresa-info {
-                        display: flex;
-                        align-items: center;
-                        margin: 5px 0;
-                        font-size: 14px;
-                    }
-                    .empresa-label {
-                        font-weight: bold;
-                        color: #666;
-                        min-width: 80px;
-                    }
-                    .empresa-valor {
-                        color: #333;
-                        margin-left: 10px;
-                    }
-                    .empresa-avaliacao {
-                        display: inline-flex;
-                        align-items: center;
-                        background: #f0f0f0;
-                        padding: 4px 8px;
-                        border-radius: 15px;
-                        font-size: 12px;
-                        color: #666;
-                    }
-                    .empresa-acoes {
-                        margin-top: 15px;
-                        display: flex;
-                        gap: 10px;
-                    }
-                    .btn-whatsapp {
-                        background: #25D366;
-                        color: white;
-                        text-color: white;
-                        padding: 8px 16px;
-                        border-radius: 5px;
-                        text-decoration: none;
-                        font-size: 12px;
-                        display: inline-block;
-                        font-weight: bold;
-                    }
-                    .btn-site {
-                        background: #007bff;
-                        color: white;
-                        padding: 8px 16px;
-                        border-radius: 5px;
-                        text-decoration: none;
-                        font-size: 12px;
-                        display: inline-block;
-                    }
-                    </style>
-                """, unsafe_allow_html=True)
+                with open(os.getenv('PATH_CSS_CARDS')) as f:
+                    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
                 
                 st.markdown("### 🏢 Empresas selecionadas para solicitar cotação:")
                 
@@ -207,8 +122,7 @@ with st.container():
                                 💬 Enviar cotação via WhatsApp
                             </a>                        
                     """
-                    
-                    
+                                        
                     card_html += "</div></div>"
                     
                     # Renderizar o card no container específico
@@ -226,22 +140,11 @@ with st.container():
 
 
 # Rodapé customizado
+with open(os.getenv('PATH_CSS_FOOTER')) as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 st.markdown(
     """
-    <style>
-    .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background: #D48C00;
-        color: #000;
-        text-align: center;
-        padding: 10px 0 8px 0;
-        font-size: 16px;
-        z-index: 100;
-    }
-    </style>
     <div class="footer">
         Copyright Marlon Andrei - Todos os direitos reservados
     </div>

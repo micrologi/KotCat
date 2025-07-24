@@ -1,13 +1,16 @@
 import sqlite3
 import os
 from typing import List, Optional, Dict, Any, Tuple
+import dotenv
+
+dotenv.load_dotenv('config.env')
 
 class Banco:
     """
     Classe para gerenciar o banco de dados kotcat.db
     """
     
-    def __init__(self, db_file: str = "data/kotcat.db"):
+    def __init__(self, db_file: str = os.getenv('PATH_DB')):
         """
         Inicializa a conexão com o banco de dados
         
