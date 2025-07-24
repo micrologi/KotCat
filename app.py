@@ -52,14 +52,16 @@ with st.container():
             estados_lista = list(estados_cidades.keys())
             estado_index = 0
             if localizacao_usuario:
-                estado_index = estados_lista.index(estado_usuario)
+                if estado_usuario in estados_lista:
+                    estado_index = estados_lista.index(estado_usuario)
             
             estado = st.selectbox("Estado", estados_lista, index=estado_index)
         with col3:
             cidades_lista = list(estados_cidades[estado])
             cidade_index = 0
             if localizacao_usuario:
-                cidade_index = cidades_lista.index(cidade_usuario)
+                if cidade_usuario in cidades_lista:
+                    cidade_index = cidades_lista.index(cidade_usuario)
 
             cidade = st.selectbox("Cidade", estados_cidades[estado], index=cidade_index)
         with col4:
