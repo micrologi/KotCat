@@ -9,6 +9,7 @@ from geopy.geocoders import Nominatim
 from banco import Banco
 import dotenv
 import os
+from localizacao import Localizacao
 
 # Carregar variáveis de ambiente do arquivo .env
 dotenv.load_dotenv()    
@@ -35,7 +36,12 @@ with st.container():
     banco = Banco()
     tipos_negocios = banco.obter_tipos()
     estados_cidades = banco.obter_estados_cidades()
-    
+
+    localizacao = Localizacao()
+    localizacao_usuario = localizacao.obter_localizacao()
+    if localizacao_usuario:
+        latitude, longitude = localizacao_usuario
+        cidade_usuario, estado_usuario = banco.retornar_estado_cidade(latitude, longitude)
 
     form_container = st.container()
     with form_container:
@@ -43,15 +49,25 @@ with st.container():
         with col1:
             tipo_negocio = st.selectbox("Tipo de Negócio", tipos_negocios)
         with col2:
-            estado = st.selectbox("Estado", list(estados_cidades.keys()), index=25)
+            estados_lista = list(estados_cidades.keys())
+            estado_index = 0
+            if localizacao_usuario:
+                estado_index = estados_lista.index(estado_usuario)
+            
+            estado = st.selectbox("Estado", estados_lista, index=estado_index)
         with col3:
-            cidade = st.selectbox("Cidade", estados_cidades[estado], index=0)
+            cidades_lista = list(estados_cidades[estado])
+            cidade_index = 0
+            if localizacao_usuario:
+                cidade_index = cidades_lista.index(cidade_usuario)
+
+            cidade = st.selectbox("Cidade", estados_cidades[estado], index=cidade_index)
         with col4:
             AVALIACAO_MINIMA = st.slider("Avaliação Mínima", min_value=1, max_value=100, value=50, step=1)
         with col5:
             SENSIBILIDADE = st.slider("Sensibilidade", min_value=1, max_value=20, value=13, step=1)
 
-        st.markdown("#### Mensagem")
+        st.markdown("#### Mensagem de Cotação")
         mensagem = st.text_area("Escreva a mensagem da cotação a ser enviada (até 1500 caracteres)", max_chars=1500, label_visibility="collapsed")
 
         enviar = st.button("Clique aqui para eu analisar e trazer as empresas", use_container_width=True)

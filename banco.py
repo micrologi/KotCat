@@ -282,6 +282,36 @@ class Banco:
         finally:
             self.desconectar()
     
+    def retornar_estado_cidade(self,latitude :float, longitude: float) -> Tuple[str, str]:
+        """
+        Retorna estado e cidade do usuário com base na localização.
+        """
+        if not self.conectar():
+            return None
+        
+        try:
+            self.cursor.execute("""
+                select 
+                    cidade, estado	 
+                from cidades
+                where round(cidades.latitude,1) = round(?,1)
+                and round(cidades.longitude,1) = round(?,1);
+            """, (latitude, longitude,))
+            resultado = self.cursor.fetchone()
+            
+            if resultado:
+                return (
+                    resultado[0],
+                    resultado[1]
+                )
+            return None
+        except Exception as e:
+            print(f"❌ Erro ao buscar cidade e estado pela localização: {e}")
+            return None
+        finally:
+            self.desconectar()
+                        
+    
     def obter_estatisticas(self) -> Dict[str, Any]:
         """
         Retorna estatísticas do banco de dados

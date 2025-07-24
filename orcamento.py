@@ -5,6 +5,11 @@ import requests
 import json
 import math
 from typing import Optional, List, Dict, Any
+import dotenv
+import os
+
+# Carregar variáveis de ambiente do arquivo .env
+dotenv.load_dotenv()    
 
 
 class Orcamento:
@@ -25,7 +30,7 @@ class Orcamento:
             api_key (str): Chave da API do Google Serper
         """
         self.api_key = api_key
-        self.url_api = "https://google.serper.dev/maps"
+        self.url_api = os.getenv('SERPER_URL_API')
         self.headers = {
             'X-API-KEY': api_key,
             'Content-Type': 'application/json'
