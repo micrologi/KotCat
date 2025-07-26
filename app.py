@@ -70,7 +70,7 @@ with st.container():
             SENSIBILIDADE = st.slider("Sensibilidade", min_value=1, max_value=20, value=13, step=1)
 
         st.markdown("#### Mensagem de Cotação")
-        mensagem = st.text_area("Escreva a mensagem da cotação a ser enviada (até 1500 caracteres)", max_chars=1500, label_visibility="collapsed")
+        mensagem = st.text_area("Escreva a mensagem da cotação a ser enviada (até 1500 caracteres)", max_chars=1500, label_visibility="collapsed", placeholder="Exemplo: Olá, gostaria de saber quanto está a mensalidade da academia, os dias e horários de funcionamento e modalidades oferecidas?")
 
         enviar = st.button("Clique aqui para eu analisar e trazer as empresas", use_container_width=True)
 
