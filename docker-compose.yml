@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  kotcat:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - PYTHONPATH=/app
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    volumes:
+      # Montar o banco de dados para persistência (opcional)
+      - ./data:/app/data
+      # Montar logs para debug (opcional)
+      - ./logs:/app/logs
+    restart: unless-stopped
+    container_name: kotcat-app 

@@ -23,7 +23,6 @@ st.set_page_config(
 )
 
 # Estilo customizado
-# Carregar CSS externo
 with open(os.getenv('PATH_CSS_APP')) as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
@@ -31,7 +30,7 @@ st.title("🐱 KotCat - Ajudo com sua cotação!")
 
 # Formulário
 with st.container():
-    st.markdown("### Miau..vou te ajudar com sua cotação! Preencha o formulário abaixo:")
+    #st.markdown("### Miau..vou te ajudar com sua cotação! Preencha o formulário abaixo:")
 
     banco = Banco()
     tipos_negocios = banco.obter_tipos()
@@ -45,9 +44,12 @@ with st.container():
 
     form_container = st.container()
     with form_container:
+        
         col1, col2, col3, col4, col5 = st.columns(5)
+        
         with col1:
-            tipo_negocio = st.selectbox("Tipo de Negócio", tipos_negocios)
+            tipo_negocio = st.selectbox("Tipo de Negócio", tipos_negocios,str = 'Escolha uma opçâo', accept_new_options = True)
+        
         with col2:
             estados_lista = list(estados_cidades.keys())
             estado_index = 0
@@ -56,6 +58,7 @@ with st.container():
                     estado_index = estados_lista.index(estado_usuario)
             
             estado = st.selectbox("Estado", estados_lista, index=estado_index)
+        
         with col3:
             cidades_lista = list(estados_cidades[estado])
             cidade_index = 0
@@ -64,13 +67,25 @@ with st.container():
                     cidade_index = cidades_lista.index(cidade_usuario)
 
             cidade = st.selectbox("Cidade", estados_cidades[estado], index=cidade_index)
+        
         with col4:
             AVALIACAO_MINIMA = st.slider("Avaliação Mínima", min_value=1, max_value=100, value=50, step=1)
+        
         with col5:
             SENSIBILIDADE = st.slider("Sensibilidade", min_value=1, max_value=20, value=13, step=1)
 
         st.markdown("#### Mensagem de Cotação")
         mensagem = st.text_area("Escreva a mensagem da cotação a ser enviada (até 1500 caracteres)", max_chars=1500, label_visibility="collapsed", placeholder="Exemplo: Olá, gostaria de saber quanto está a mensalidade da academia, os dias e horários de funcionamento e modalidades oferecidas?")
+        
+        # Anexar arquivo
+        uploaded_files = st.file_uploader("Anexar um arquivo?", 
+                                         type=["pdf", "jpg", "jpeg", "png", "bmp", "txt"], 
+                                         label_visibility="hidden", 
+                                         help="Anexe um arquivo para auxiliar na cotação",
+                                         accept_multiple_files=True)
+        if uploaded_files is not None:
+            for uploaded_file in uploaded_files:
+                st.write("Arquivo anexado:", uploaded_file.name)    
 
         enviar = st.button("Clique aqui para eu analisar e trazer as empresas", use_container_width=True)
 
@@ -78,7 +93,8 @@ with st.container():
             
             # Buscar a latitude e longitude do endereço
             LATITUDE, LONGITUDE = banco.obter_latitude_longitude(cidade, estado)
-                
+             
+            print(f'Latitude: {LATITUDE} / Longitude: {LONGITUDE}')   
             #st.success("✅ Perfeito, agora vamos buscar as empresas para você. Aguarde, elas serão exibidas logo abaixo:")
             
             orcamento = Orcamento(os.getenv('SERPER_API_KEY'))
