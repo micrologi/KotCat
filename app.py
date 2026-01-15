@@ -45,10 +45,13 @@ with st.container():
     form_container = st.container()
     with form_container:
         
-        col1, col2, col3, col4, col5 = st.columns(5)
+        col1, col2, col3 = st.columns(3)
         
         with col1:
-            tipo_negocio = st.multiselect("Tipo de Negócio", tipos_negocios)
+            tipo_negocio = st.selectbox("Tipo de Negócio", tipos_negocios)
+            tipo_negocio_novo = st.text_input('Não achou? Digite outro tipo de negócio')
+            
+            tipo_negocio = tipo_negocio_novo if tipo_negocio_novo else tipo_negocio
         
         with col2:
             estados_lista = list(estados_cidades.keys())
@@ -68,11 +71,11 @@ with st.container():
 
             cidade = st.selectbox("Cidade", estados_cidades[estado], index=cidade_index)
         
-        with col4:
-            AVALIACAO_MINIMA = st.slider("Avaliação Mínima", min_value=1, max_value=100, value=50, step=1)
+        #with col4:
+        #    AVALIACAO_MINIMA = st.slider("Avaliação Mínima", min_value=1, max_value=100, value=50, step=1)
         
-        with col5:
-            SENSIBILIDADE = st.slider("Sensibilidade", min_value=1, max_value=20, value=13, step=1)
+        #with col5:
+        #    SENSIBILIDADE = st.slider("Sensibilidade", min_value=1, max_value=20, value=13, step=1)
 
         st.markdown("#### Mensagem de Cotação")
         mensagem = st.text_area("Escreva a mensagem da cotação a ser enviada (até 1500 caracteres)", max_chars=1500, label_visibility="collapsed", placeholder="Exemplo: Olá, gostaria de saber quanto está a mensalidade da academia, os dias e horários de funcionamento e modalidades oferecidas?")
@@ -96,9 +99,6 @@ with st.container():
              
             print(f'Latitude: {LATITUDE} / Longitude: {LONGITUDE}')   
             #st.success("✅ Perfeito, agora vamos buscar as empresas para você. Aguarde, elas serão exibidas logo abaixo:")
-            
-            # tipo_negocio retorna uma lista, abaixo transformo em uma string
-            tipo_negocio = ", ".join(tipo_negocio)            
             
             orcamento = Orcamento(os.getenv('SERPER_API_KEY'))
             orcamento.pesquisar_negocios(negocio=tipo_negocio, latitude=LATITUDE, longitude=LONGITUDE, avaliacao_minima=AVALIACAO_MINIMA, raio=SENSIBILIDADE)
