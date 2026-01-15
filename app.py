@@ -48,7 +48,7 @@ with st.container():
         col1, col2, col3, col4, col5 = st.columns(5)
         
         with col1:
-            tipo_negocio = st.selectbox("Tipo de Negócio", tipos_negocios, accept_new_options = True)
+            tipo_negocio = st.multiselect("Tipo de Negócio", tipos_negocios)
         
         with col2:
             estados_lista = list(estados_cidades.keys())
@@ -96,6 +96,9 @@ with st.container():
              
             print(f'Latitude: {LATITUDE} / Longitude: {LONGITUDE}')   
             #st.success("✅ Perfeito, agora vamos buscar as empresas para você. Aguarde, elas serão exibidas logo abaixo:")
+            
+            # tipo_negocio retorna uma lista, abaixo transformo em uma string
+            tipo_negocio = ", ".join(tipo_negocio)            
             
             orcamento = Orcamento(os.getenv('SERPER_API_KEY'))
             orcamento.pesquisar_negocios(negocio=tipo_negocio, latitude=LATITUDE, longitude=LONGITUDE, avaliacao_minima=AVALIACAO_MINIMA, raio=SENSIBILIDADE)
