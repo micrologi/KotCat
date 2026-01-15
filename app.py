@@ -48,7 +48,7 @@ with st.container():
         col1, col2, col3, col4, col5 = st.columns(5)
         
         with col1:
-            tipo_negocio = st.selectbox("Tipo de Negócio", tipos_negocios,str = 'Escolha uma opçâo', accept_new_options = True)
+            tipo_negocio = st.selectbox("Tipo de Negócio", tipos_negocios, accept_new_options = True)
         
         with col2:
             estados_lista = list(estados_cidades.keys())
